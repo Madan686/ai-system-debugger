@@ -9,7 +9,6 @@ async function analyzeError() {
     const fixSteps = document.getElementById("fixSteps");
     const category=document.getElementById("category");
     const correctedCommand = document.getElementById("correctedCommand");
-
     const errorText = errorInput.value.trim();
 
     // Validation
@@ -109,12 +108,14 @@ function copyCorrectedCommand() {
 async function loadHistory() {
 
     const historyContainer = document.getElementById("historyContainer");
+    const searchInput=document.getElementById("historySearch");
+    const searchText=searchInput.value.trim();
 
     historyContainer.innerHTML = "<p>Loading history...</p>";
 
     try {
 
-        const response = await fetch("/history");
+        const response = await fetch(`/history?search=${encodeURIComponent(searchText)}`);
 
         const data = await response.json();
 

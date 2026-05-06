@@ -64,13 +64,13 @@ def analyze_error():
 
 @app.route("/history", methods=["GET"])
 def history():
-    records=get_analysis_history()
-
+    search_query=request.args.get("search","").strip()
+    records=get_analysis_history(search_query)
+    
     return jsonify({
         "success":True,
         "history":records
     })
-
 
 
 if __name__ == "__main__":

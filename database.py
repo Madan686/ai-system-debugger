@@ -75,15 +75,39 @@ def save_analysis(error_text, analysis):
     connection.close()
 
 
-def get_analysis_history():
+def get_analysis_history(search_query=None):
     """
     Fectches previous debugging result from the database.
     Latest records come first.
     """
     
     connection=get_db_connection()
+    if search_query:
+        search_pattern=f"%{search_query}%"
 
-    rows= connection.execute("""
+        rows= connection.execute("""
+                             Select 
+                             id,
+                             error_text,
+                             category,  
+                             summary,
+                             root_cause,
+                             possible_location,
+                             fix_steps,
+                             corrected_code_or_command,
+                             created_at
+                             From debug_history
+                                 where 
+                                 error_text Like ?
+                                 OR category Like ?
+                                 OR summary Like ?
+                                 OR root_cause Like ?
+                             Order by id desc
+                             """, ( search_pattern, search_pattern, search_pattern, search_pattern )).fetchall()
+        
+
+    else:
+        rows= connection.execute("""
                              Select 
                              id,
                              error_text,
@@ -98,7 +122,9 @@ def get_analysis_history():
                              Order by id desc
                              """).fetchall()
     
+
     connection.close()
+
 
     history=[]
     for row in rows:
