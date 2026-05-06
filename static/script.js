@@ -81,3 +81,84 @@ async function analyzeError() {
         loading.classList.add("hidden");
     }
 }
+
+async function loadHistory() {
+
+    const historyContainer = document.getElementById("historyContainer");
+
+    historyContainer.innerHTML = "<p>Loading history...</p>";
+
+    try {
+
+        const response = await fetch("/history");
+
+        const data = await response.json();
+
+        if (!data.success) {
+
+            historyContainer.innerHTML = "<p>Failed to load history.</p>";
+
+            return;
+        }
+
+        const history = data.history;
+
+        if (history.length === 0) {
+
+            historyContainer.innerHTML = "<p>No history found.</p>";
+
+            return;
+        }
+
+        historyContainer.innerHTML = "";
+
+        history.forEach(function(record) {
+
+            const card = document.createElement("div");
+
+            card.classList.add("history-card");
+
+            let fixStepsHtml = "";
+
+            record.fix_steps.forEach(function(step) {
+
+                fixStepsHtml += `<li>${step}</li>`;
+            });
+
+            card.innerHTML = `
+                <h3>Error</h3>
+                <p>${record.error_text}</p>
+
+                <h3>Summary</h3>
+                <p>${record.summary}</p>
+
+                <h3>Root Cause</h3>
+                <p>${record.root_cause}</p>
+
+                <h3>Possible Location</h3>
+                <p>${record.possible_location}</p>
+
+                <h3>Fix Steps</h3>
+                <ul>
+                    ${fixStepsHtml}
+                </ul>
+
+                <h3>Corrected Code / Command</h3>
+                <p>${record.corrected_code_or_command}</p>
+
+                <div class="timestamp">
+                    Saved At: ${record.created_at}
+                </div>
+            `;
+
+            historyContainer.appendChild(card);
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        historyContainer.innerHTML =
+            "<p>Failed to connect to backend.</p>";
+    }
+}

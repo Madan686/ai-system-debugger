@@ -87,3 +87,37 @@ button:hover{
 .result-box li{
     line-height: 1.6;
 }
+.history-section {
+    margin-top: 40px;
+}
+
+.history-card {
+    background: #ffffff;
+    border-left: 5px solid #2563eb;
+    padding: 18px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.history-card h3 {
+    margin-top: 0;
+    color: #111827;
+}
+
+.history-card p {
+    line-height: 1.6;
+    margin: 8px 0;
+}
+
+.history-card ul {
+    margin-top: 5px;
+}
+
+.timestamp {
+    color: #666;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+

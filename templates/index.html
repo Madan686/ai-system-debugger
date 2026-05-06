@@ -35,7 +35,16 @@
             <h3>Fix Steps</h3>
             <ul id="fixSteps"></ul>
         </div>
+    <div class="history-section">
+        <h2> Debug History</h2>
+
+        <button onClick="loadHistory()">Load History</button>
+        <div id="historyContainer"></div>
     </div>
+
+    </div>
+
+    
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
