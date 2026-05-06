@@ -27,6 +27,7 @@ def create_history_table():
     connection.execute(""" Create Table if not exists debug_history (
                        id Integer Primary key AUTOINCREMENT,
                        error_text text not null,
+                       category text not null,
                        summary text not null,
                        root_cause text not null,
                        possible_location text,
@@ -50,6 +51,7 @@ def save_analysis(error_text, analysis):
     connection = get_db_connection()
     connection.execute(""" Insert into debug_history(
                        error_text,
+                       category,
                        summary,
                        root_cause,
                        possible_location,
@@ -57,8 +59,9 @@ def save_analysis(error_text, analysis):
                        corrected_code_or_command,
                        created_at
                        
-                       ) values (?,?,?,?,?,?,?)
+                       ) values (?,?,?,?,?,?,?,?)
                        """,(error_text,
+                            analysis.get("category","Unknown Error"),
                             analysis.get("summary",""),
                             analysis.get("root_cause",""),
                             analysis.get("possible_location",""),
@@ -84,6 +87,7 @@ def get_analysis_history():
                              Select 
                              id,
                              error_text,
+                             category,  
                              summary,
                              root_cause,
                              possible_location,
@@ -101,6 +105,7 @@ def get_analysis_history():
         history.append({
             "id": row["id"],
             "error_text": row["error_text"],
+            "category": row["category"],
             "summary": row["summary"],
             "root_cause": row["root_cause"],
             "possible_location": row["possible_location"],

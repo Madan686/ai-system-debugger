@@ -26,6 +26,9 @@
         <div id="result" class="result-box hidden">
             <h2>Analysis Result</h2>
 
+            <h3> Category </h3>
+            <p id="category"></p>
+
             <h3>Summary</h3>
             <p id="summary"></p>
 
@@ -34,6 +37,11 @@
 
             <h3>Fix Steps</h3>
             <ul id="fixSteps"></ul>
+
+            <h3> Corrected Code / Command</h3>
+                <pre id="correctedCommand"></pre>
+
+                <button onclick="copyCorrectedCommand()">Copy Command</button>
         </div>
     <div class="history-section">
         <h2> Debug History</h2>

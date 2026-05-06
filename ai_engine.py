@@ -19,34 +19,62 @@ def build_debug_prompt(error_text):
     prompt = f"""
 You are an expert software debugging assistant.
 
-Analyze the given error log and return ONLY valid JSON.
+Your task:
+Analyze the given error log or stack trace and produce a clear debugging explanation.
+
+Return ONLY valid JSON.
 Do not return markdown.
 Do not return explanation outside JSON.
+Do not add extra keys.
+Do not skip any key.
 
 Return exactly this JSON structure:
 
 {{
-  "summary": "Explain the error in maximum 2 short sentences.",
-  "root_cause": "Explain the most likely reason in maximum 2 short sentences.",
-  "possible_location": "Mention where the issue most likely exists.",
+  "category": "Choose one: Dependency Error, Import Error, Database Error, Authentication Error, Runtime Error, API Error, Configuration Error, Syntax Error, Network Error, File System Error, Environment Error, Unknown Error",
+  "summary": "Explain what the error means in maximum 2 short sentences.",
+  "root_cause": "Explain the most likely technical cause in maximum 2 short sentences.",
+  "possible_location": "Mention the most likely file, function, dependency, configuration, API, database, or runtime area where the issue exists.",
   "fix_steps": [
-    "First practical fix step",
-    "Second practical fix step",
-    "Third practical fix step"
+    "First practical debugging step",
+    "Second practical debugging step",
+    "Third practical debugging step"
   ],
-  "corrected_code_or_command": "Provide corrected code or command if applicable. If not applicable, write Not applicable."
+  "corrected_code_or_command": "Return ONLY raw command or code.
+Do not explain it.
+Do not add sentences before or after it.
+Examples:
+pip install flask
+python app.py
+requests.post(url, json=data)"
 }}
 
-Rules:
-- Keep the response simple.
-- Do not write a long summary.
-- Fix steps must be specific and practical.
+Guidelines:
+- Focus mainly on debugging, not only classification.
+- Category should be selected based on the primary cause.
+- Keep summary short and beginner-friendly.
+- Root cause must be specific, not generic.
+- Fix steps must be practical and directly related to the error.
+- corrected_code_or_command should contain only the command or code when useful.
+- Avoid unsafe advice such as permanently disabling SSL verification.
 - Return only JSON.
+
+Small classification guide:
+- Missing module during import → Import Error
+- Package install/version/setup issue → Dependency Error
+- SQL/MongoDB/table/query/connection issue → Database Error
+- Token/API key/login/permission issue → Authentication Error
+- HTTP endpoint/method/status/request issue → API Error
+- Missing env/config/secret/settings issue → Configuration Error
+- Invalid code syntax → Syntax Error
+- Server/DNS/socket/timeout connection issue → Network Error
+- Missing file/path/read/write issue → File System Error
+- OS/driver/runtime/version issue → Environment Error
+- Code fails during execution but does not fit above → Runtime Error
 
 Error Log:
 {error_text}
 """
-
     return prompt
 
 
@@ -71,6 +99,7 @@ def extract_json_from_response(ai_text):
 
     except Exception:
         return {
+            "category": "Unknown Error",
             "summary": "AI returned an invalid response format.",
             "root_cause": "The model did not return valid JSON.",
             "possible_location": "AI response parser",
@@ -115,6 +144,7 @@ def analyze_with_ollama(error_text):
 
     except requests.exceptions.ConnectionError:
         return {
+            "category": "AI Runtime Error",
             "summary": "Ollama is not running.",
             "root_cause": "The Flask app cannot connect to the local Ollama server.",
             "possible_location": "Ollama service",
@@ -128,6 +158,7 @@ def analyze_with_ollama(error_text):
 
     except requests.exceptions.Timeout:
         return {
+            "category": "AI Runtime Error",
             "summary": "The AI model took too long to respond.",
             "root_cause": "The local model may be slow or overloaded.",
             "possible_location": "Ollama runtime",
@@ -141,6 +172,7 @@ def analyze_with_ollama(error_text):
 
     except requests.exceptions.RequestException as error:
         return {
+            "category": "API Error",
             "summary": "AI request failed.",
             "root_cause": str(error),
             "possible_location": "Ollama API request",

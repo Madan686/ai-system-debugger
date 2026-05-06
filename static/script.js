@@ -7,6 +7,8 @@ async function analyzeError() {
     const summary = document.getElementById("summary");
     const rootCause = document.getElementById("rootCause");
     const fixSteps = document.getElementById("fixSteps");
+    const category=document.getElementById("category");
+    const correctedCommand = document.getElementById("correctedCommand");
 
     const errorText = errorInput.value.trim();
 
@@ -46,14 +48,15 @@ async function analyzeError() {
             {
                 summary: "...",
                 root_cause: "...",
-                fix_steps: [...]
+                fix_steps: [...],   
+                category: "..."
             }
         */
 
         summary.textContent = data.analysis.summary;
-
+        category.textContent = data.analysis.category;
         rootCause.textContent = data.analysis.root_cause;
-
+        correctedCommand.textContent = data.analysis.corrected_code_or_command;
         // Clear old steps
         fixSteps.innerHTML = "";
 
@@ -81,6 +84,27 @@ async function analyzeError() {
         loading.classList.add("hidden");
     }
 }
+
+function copyCorrectedCommand() {
+    const correctedCommand = document.getElementById("correctedCommand");
+
+    const commandText = correctedCommand.textContent.trim();
+
+    if (commandText === "" || commandText === "Not applicable") {
+        alert("No command available to copy.");
+        return;
+    }
+
+    navigator.clipboard.writeText(commandText)
+        .then(function() {
+            alert("Command copied to clipboard.");
+        })
+        .catch(function(error) {
+            console.error(error);
+            alert("Failed to copy command.");
+        });
+}
+
 
 async function loadHistory() {
 
@@ -128,6 +152,9 @@ async function loadHistory() {
             card.innerHTML = `
                 <h3>Error</h3>
                 <p>${record.error_text}</p>
+                
+                <h3>Category</h3>
+                <p class="category-badge">${record.category}</p>
 
                 <h3>Summary</h3>
                 <p>${record.summary}</p>
