@@ -1,6 +1,26 @@
 from flask import Flask, render_template, request, jsonify
+from ai_engine import analyze_with_ollama
 
 app=Flask(__name__)
+
+
+def validate_error_input(error_text):
+    """
+    Validates the error text submitted by the user.
+    
+    Rules: 
+    1. Input should not be Empty.
+    2. Input should be minimum of 10 characters.
+    """
+
+    if not error_text:
+        return False, "Error text is required."
+    
+    if len(error_text.strip())< 10:
+        return False, "Enter the valid error log with atleast of 10 characters."
+    
+    return True, "Valid Input."
+
 
 @app.route("/")
 def home():
@@ -11,36 +31,34 @@ def home():
     """
     return render_template("index.html")
 
-@app.route("/analyze", method=["POST"])
+
+@app.route("/analyze", methods=["POST"])
 def analyze_error():
     """
     Receives error text from the frontend.
-    for noe, it only returns sample response.
-    Later, we will connect AI logic here.
+    Validates it, sends it to Ollama,
+    and returns AI-generated analysis.
     """
 
-    data=request.get_json()
-    
-    error_text= data.get("error_text","")
-    if not error_text.strip():
+    data = request.get_json() or {}
+
+    error_text = data.get("error_text", "")
+
+    is_valid, message = validate_error_input(error_text)
+
+    if not is_valid:
         return jsonify({
-            "success":False,
-            "message": "Error text cannot be empty."
+            "success": False,
+            "message": message
         }), 400
-    
+
+    ai_result = analyze_with_ollama(error_text)
+
     return jsonify({
-        "success":True,
-        "analysis":{
-            "summary": "sample error summary",
-            "root_cause": "Sample root cause",
-            "fix_steps": [
-                "Check the error line",
-                "Verify the variable or dependency",
-                "Apply the correct"
-                "ed code"
-            ]
-        }
+        "success": True,
+        "analysis": ai_result
     })
+
 
 if __name__ == "__main__":
     app.run(debug=True)

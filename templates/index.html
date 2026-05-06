@@ -2,37 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI System Debugger</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+
     <div class="container">
         <h1>AI System Debugger</h1>
+
         <p class="subtitle">
-            paste your error log or stack trace and get a clear  debugging explaination.
+            Paste your error log or stack trace and get a clear debugging explanation.
         </p>
 
-        <textarea id="errorInput" placeholder="Paste your error log here..."></textarea>
+        <textarea 
+            id="errorInput" 
+            placeholder="Paste your error log here..."
+        ></textarea>
 
-        <button onClick="analyzeError()"> Analyze Error</button>
+        <button onclick="analyzeError()">Analyze Error</button>
 
-        <div id="loading" class="hidden">Analyzing....</div>
+        <div id="loading" class="hidden">Analyzing...</div>
 
         <div id="result" class="result-box hidden">
-
             <h2>Analysis Result</h2>
 
             <h3>Summary</h3>
             <p id="summary"></p>
 
-            <h3> Root Cause </h3>
+            <h3>Root Cause</h3>
             <p id="rootCause"></p>
 
-            <h3> Fix Steps </h3>
+            <h3>Fix Steps</h3>
             <ul id="fixSteps"></ul>
         </div>
     </div>
 
-    <script src="/static/script.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
