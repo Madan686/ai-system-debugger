@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 from ai_engine import analyze_with_ollama
+from database import create_history_table, save_analysis, get_analysis_history
 
 app=Flask(__name__)
-
+create_history_table()
 
 def validate_error_input(error_text):
     """
@@ -53,11 +54,23 @@ def analyze_error():
         }), 400
 
     ai_result = analyze_with_ollama(error_text)
+    save_analysis(error_text, ai_result)
 
     return jsonify({
         "success": True,
         "analysis": ai_result
     })
+
+
+@app.route("/history", methods=["GET"])
+def history():
+    records=get_analysis_history()
+
+    return jsonify({
+        "success":True,
+        "history":records
+    })
+
 
 
 if __name__ == "__main__":
